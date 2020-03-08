@@ -24,7 +24,7 @@ def get_contributors(org, repo, m):
     contributors = []
     for i in contributors_json:
         contributors.append((i["total"], i["author"]["login"], i["author"]["html_url"]))
-    contributors.sort(reverse=True)
+    contributors=contributors[::-1]
     if (len(contributors) <= m):
         return contributors
     else:
