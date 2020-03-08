@@ -1,8 +1,9 @@
 import requests
 
-repo_url = "https://api.github.com/users/{organization}/repos"
+repo_url = "https://api.github.com/search/repositories?q=org:{organization}&sort=forks&order=desc&per_page={count}"
 contributors_url = "https://api.github.com/repos/{organization}/{repo}/stats/contributors"
 user_url = "https://api.github.com/users/{user}"
+#Add your own Token
 token = ""
 
 headers = {
@@ -11,15 +12,11 @@ headers = {
 
 
 def get_repos(org, n):
-    repos_json = requests.get(repo_url.format(organization=org), headers=headers).json()
+    repos_json = requests.get(repo_url.format(organization=org,count=n), headers=headers).json()
     repos = []
-    for i in repos_json:
+    for i in repos_json["items"]:
         repos.append((i['forks_count'], i["name"], i["html_url"]))
-    repos.sort(reverse=True)
-    if (len(repos) <= n):
-        return repos
-    else:
-        return repos[0:n]
+    return repos
 
 
 def get_contributors(org, repo, m):
@@ -43,5 +40,5 @@ def get_org_contribution(org, n, m):
             print("\tUsername: " + j[1] + " ,User url: " + j[2] + " ,Commit Count: " + str(j[0]))
         print("\n")
 
-
+#(Organization github id,n,m)
 get_org_contribution("microsoft", 6, 4)
