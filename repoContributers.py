@@ -3,6 +3,7 @@ import requests
 repo_url = "https://api.github.com/users/{organization}/repos"
 contributors_url = "https://api.github.com/repos/{organization}/{repo}/stats/contributors"
 user_url = "https://api.github.com/users/{user}"
+#Edit this variable with your token
 token = "a185d8545d8121ac232f75ee7628300f86b73fa4"
 
 headers = {
@@ -43,5 +44,5 @@ def get_org_contribution(org, n, m):
             print("\tUsername: " + j[1] + " ,User url: " + j[2] + " ,Commit Count: " + str(j[0]))
         print("\n")
 
-
+#Call by 1st param Organization 2nd param n 3rd param m
 get_org_contribution("microsoft", 6, 4)
