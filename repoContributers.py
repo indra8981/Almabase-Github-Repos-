@@ -3,7 +3,7 @@ import requests
 repo_url = "https://api.github.com/users/{organization}/repos"
 contributors_url = "https://api.github.com/repos/{organization}/{repo}/stats/contributors"
 user_url = "https://api.github.com/users/{user}"
-token = "a185d8545d8121ac232f75ee7628300f86b73fa4"
+token = ""
 
 headers = {
     "Authorization": "Token " + token
