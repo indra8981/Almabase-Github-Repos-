@@ -3,7 +3,9 @@ import requests
 repo_url = "https://api.github.com/search/repositories?q=org:{organization}&sort=forks&order=desc&per_page={count}"
 contributors_url = "https://api.github.com/repos/{organization}/{repo}/stats/contributors"
 user_url = "https://api.github.com/users/{user}"
-#Add your own Token
+
+
+# Add your own Token
 token = ""
 
 headers = {
@@ -11,34 +13,74 @@ headers = {
 }
 
 
-def get_repos(org, n):
-    repos_json = requests.get(repo_url.format(organization=org,count=n), headers=headers).json()
+class Contrib:
+    def __init__(self, id, url, total_commit):
+        self.__id = id
+        self.__url = url
+        self.__commit_count = total_commit
+
+    def get_id(self):
+        return self.__id
+
+    def get_url(self):
+        return self.__url
+
+    def get_commit_count(self):
+        return self.__commit_count
+
+
+class Repo:
+    def __init__(self, id, url, f_count, contri):
+        self.__id = id
+        self.__url = url
+        self.__fork_count = f_count
+        self.__contri = contri
+
+    def get_id(self):
+        return self.__id
+
+    def get_url(self):
+        return self.__url
+
+    def get_fork_count(self):
+        return self.__fork_count
+
+    def get_contri(self):
+        return self.__contri
+
+
+def get_repos(org, n, m):
+    repos_json = requests.get(repo_url.format(
+        organization=org, count=n), headers=headers).json()
+    if("message" in repos_json):
+        return "404"
     repos = []
     for i in repos_json["items"]:
-        repos.append((i['forks_count'], i["name"], i["html_url"]))
+        contributors = get_contributors(org, i["name"], m)
+        repos.append(Repo(i["name"], i["html_url"],
+                          i['forks_count'], contributors))
     return repos
 
 
 def get_contributors(org, repo, m):
-    contributors_json = requests.get(contributors_url.format(organization=org, repo=repo), headers=headers).json()
+    contributors_json = requests.get(contributors_url.format(
+        organization=org, repo=repo), headers=headers).json()
     contributors = []
     for i in contributors_json:
-        contributors.append((i["total"], i["author"]["login"], i["author"]["html_url"]))
-    contributors=contributors[::-1]
-    if (len(contributors) <= m):
-        return contributors
-    else:
-        return contributors[0:m]
+        if(i["author"] == None):
+            continue
+        contributors.append(
+            (i["total"], i["author"]["login"], i["author"]["html_url"]))
+    contributors = contributors[::-1]
+    contr = []
+    for i in range(min(len(contributors), m)):
+        contr.append(
+            Contrib(contributors[i][1], contributors[i][2], contributors[i][0]))
+    return contr
 
 
 def get_org_contribution(org, n, m):
-    repos = get_repos(org, n)
-    for re in repos:
-        print("Repo-id: " + re[1] + " ,Url: " + re[2] + " ,Fork Count: " + str(re[0]))
-        contributors = get_contributors(org, re[1], m)
-        for j in contributors:
-            print("\tUsername: " + j[1] + " ,User url: " + j[2] + " ,Commit Count: " + str(j[0]))
-        print("\n")
-
-#(Organization github id,n,m)
-get_org_contribution("microsoft", 6, 4)
+    if(n <= 0 or m <= 0):
+        return "404"
+    repos = get_repos(org, n, m)
+    return repos

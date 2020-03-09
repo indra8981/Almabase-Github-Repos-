@@ -1,0 +1,42 @@
+{% extends 'base.html' %} {% block head %}
+<title>Almabase</title>
+{% endblock %} {% block body %}
+<div class="content">
+  <h3 style="text-align: center">
+    Top n repo according to forks and top m Git Users according to commits for
+    each repo
+  </h3>
+
+  <div class="form">
+    <form action="/" method="POST">
+      <label for="org">Organization:</label>
+      <input type="text" name="org" id="org" />
+      <br />
+      <br />
+      <label for="n">Value of n:</label>
+      <input type="text" name="n" id="n" />
+      <br />
+      <br />
+      <label for="m">Value of m:</label>
+      <input type="text" name="m" id="m" />
+      <br />
+      <input type="submit" value="Query Organization" />
+    </form>
+  </div>
+  {% for repo in repos %}
+  <h5>
+    Repo id: {{repo.get_id()}} ,Repo Url: {{repo.get_url()}} ,Repo Fork Count:
+    {{repo.get_fork_count()}}
+  </h5>
+  <ol>
+    {% for contri in repo.get_contri() %}
+    <li>
+      Username: {{contri.get_id()}} ,User url: {{contri.get_url()}} ,Commit
+      Count: {{contri.get_commit_count()}}
+    </li>
+    <br />
+    {% endfor %}
+  </ol>
+  {% endfor %}
+</div>
+{% endblock %}
